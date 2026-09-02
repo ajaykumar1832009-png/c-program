@@ -1,0 +1,438 @@
+// Online C compiler to run C program online
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 100
+
+struct Record
+{
+    int apID;
+    char location[50];
+    int users;
+    float data;
+    float duration;
+    char time[10];
+};
+
+struct Record r[MAX];
+int count = 0;
+
+void clearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void inputString(char str[], int size)
+{
+    fgets(str, size, stdin);
+    str[strcspn(str, "\n")] = '\0';
+}
+
+void addRecord()
+{
+    if (count >= MAX)
+    {
+        printf("\nMaximum number of records reached.\n");
+        return;
+    }
+
+    printf("\nEnter AP ID: ");
+    scanf("%d", &r[count].apID);
+    clearInputBuffer();
+
+    printf("Enter Location: ");
+    inputString(r[count].location, sizeof(r[count].location));
+
+    printf("Enter Number of Users: ");
+    scanf("%d", &r[count].users);
+
+    printf("Enter Data Usage (MB): ");
+    scanf("%f", &r[count].data);
+
+    printf("Enter Duration (hours): ");
+    scanf("%f", &r[count].duration);
+    clearInputBuffer();
+
+    printf("Enter Time of Access (HH:MM): ");
+    inputString(r[count].time, sizeof(r[count].time));
+
+    count++;
+
+    printf("\nRecord added successfully!\n");
+}
+
+void displayRecord(int i)
+{
+    printf("\n-----------------------------");
+    printf("\nAP ID       : %d", r[i].apID);
+    printf("\nLocation    : %s", r[i].location);
+    printf("\nUsers       : %d", r[i].users);
+    printf("\nData Usage  : %.2f MB", r[i].data);
+    printf("\nDuration    : %.2f hours", r[i].duration);
+    printf("\nTime        : %s", r[i].time);
+    printf("\n-----------------------------\n");
+}
+
+void displayAll()
+{
+    int i;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    printf("\n===== ALL RECORDS =====\n");
+
+    for (i = 0; i < count; i++)
+    {
+        displayRecord(i);
+    }
+}
+
+void searchRecord()
+{
+    int id, i, found = 0;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    printf("\nEnter AP ID to search: ");
+    scanf("%d", &id);
+    clearInputBuffer();
+
+    for (i = 0; i < count; i++)
+    {
+        if (r[i].apID == id)
+        {
+            displayRecord(i);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found)
+        printf("\nRecord not found.\n");
+}
+
+void modifyRecord()
+{
+    int id, i, found = 0;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    printf("\nEnter AP ID to modify: ");
+    scanf("%d", &id);
+    clearInputBuffer();
+
+    for (i = 0; i < count; i++)
+    {
+        if (r[i].apID == id)
+        {
+            printf("Enter New Location: ");
+            inputString(r[i].location, sizeof(r[i].location));
+
+            printf("Enter New Number of Users: ");
+            scanf("%d", &r[i].users);
+
+            printf("Enter New Data Usage: ");
+            scanf("%f", &r[i].data);
+
+            printf("Enter New Duration: ");
+            scanf("%f", &r[i].duration);
+            clearInputBuffer();
+
+            printf("Enter New Time: ");
+            inputString(r[i].time, sizeof(r[i].time));
+
+            printf("\nRecord modified successfully!\n");
+
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found)
+        printf("\nRecord not found.\n");
+}
+
+void sortByUsers()
+{
+    int i, j;
+    struct Record temp;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    for (i = 0; i < count - 1; i++)
+    {
+        for (j = i + 1; j < count; j++)
+        {
+            if (r[i].users < r[j].users)
+            {
+                temp = r[i];
+                r[i] = r[j];
+                r[j] = temp;
+            }
+        }
+    }
+
+    printf("\nRecords sorted by number of users.\n");
+}
+
+void sortByID()
+{
+    int i, j;
+    struct Record temp;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    for (i = 0; i < count - 1; i++)
+    {
+        for (j = i + 1; j < count; j++)
+        {
+            if (r[i].apID > r[j].apID)
+            {
+                temp = r[i];
+                r[i] = r[j];
+                r[j] = temp;
+            }
+        }
+    }
+
+    printf("\nRecords sorted by AP ID.\n");
+}
+
+void statistics()
+{
+    int i;
+    int totalUsers = 0;
+    float totalData = 0;
+    int highest = 0;
+    int lowest = 0;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    for (i = 0; i < count; i++)
+    {
+        totalUsers += r[i].users;
+        totalData += r[i].data;
+
+        if (r[i].users > r[highest].users)
+            highest = i;
+
+        if (r[i].users < r[lowest].users)
+            lowest = i;
+    }
+
+    printf("\n===== TRAFFIC STATISTICS =====\n");
+
+    printf("Total Users       : %d\n", totalUsers);
+    printf("Average Data      : %.2f MB\n", totalData / count);
+
+    printf("\nHighest Traffic AP:\n");
+    printf("AP ID             : %d\n", r[highest].apID);
+    printf("Location          : %s\n", r[highest].location);
+    printf("Users             : %d\n", r[highest].users);
+    printf("Time              : %s\n", r[highest].time);
+
+    printf("\nLowest Traffic AP:\n");
+    printf("AP ID             : %d\n", r[lowest].apID);
+    printf("Location          : %s\n", r[lowest].location);
+    printf("Users             : %d\n", r[lowest].users);
+    printf("Time              : %s\n", r[lowest].time);
+}
+
+void saveData()
+{
+    FILE *fp;
+
+    fp = fopen("wifi_traffic.dat", "wb");
+
+    if (fp == NULL)
+    {
+        printf("\nFile cannot be opened.\n");
+        return;
+    }
+
+    fwrite(&count, sizeof(count), 1, fp);
+    fwrite(r, sizeof(struct Record), count, fp);
+
+    fclose(fp);
+
+    printf("\nData saved successfully.\n");
+}
+
+void loadData()
+{
+    FILE *fp;
+
+    fp = fopen("wifi_traffic.dat", "rb");
+
+    if (fp == NULL)
+        return;
+
+    if (fread(&count, sizeof(count), 1, fp) != 1)
+    {
+        count = 0;
+        fclose(fp);
+        return;
+    }
+
+    if (count < 0 || count > MAX)
+    {
+        count = 0;
+        fclose(fp);
+        printf("\nInvalid data file.\n");
+        return;
+    }
+
+    if (fread(r, sizeof(struct Record), count, fp) != (size_t)count)
+    {
+        count = 0;
+        printf("\nData file is incomplete or corrupted.\n");
+    }
+    else
+    {
+        printf("\n%d records loaded.\n", count);
+    }
+
+    fclose(fp);
+}
+
+void generateReport()
+{
+    FILE *fp;
+    int i;
+
+    if (count == 0)
+    {
+        printf("\nNo records available.\n");
+        return;
+    }
+
+    fp = fopen("traffic_report.txt", "w");
+
+    if (fp == NULL)
+    {
+        printf("\nCannot create report.\n");
+        return;
+    }
+
+    fprintf(fp, "CAMPUS WI-FI TRAFFIC REPORT\n");
+    fprintf(fp, "===========================\n");
+    fprintf(fp, "Total Records: %d\n\n", count);
+
+    for (i = 0; i < count; i++)
+    {
+        fprintf(fp, "AP ID      : %d\n", r[i].apID);
+        fprintf(fp, "Location   : %s\n", r[i].location);
+        fprintf(fp, "Users      : %d\n", r[i].users);
+        fprintf(fp, "Data       : %.2f MB\n", r[i].data);
+        fprintf(fp, "Duration   : %.2f hours\n", r[i].duration);
+        fprintf(fp, "Time       : %s\n", r[i].time);
+        fprintf(fp, "---------------------------\n");
+    }
+
+    fclose(fp);
+
+    printf("\nReport generated successfully!\n");
+}
+
+int main()
+{
+    int choice;
+
+    loadData();
+
+    do
+    {
+        printf("\n\n=================================");
+        printf("\n CAMPUS WI-FI TRAFFIC ANALYZER");
+        printf("\n=================================");
+        printf("\n1. Add Record");
+        printf("\n2. Modify Record");
+        printf("\n3. Search Record");
+        printf("\n4. Display All Records");
+        printf("\n5. Sort by Users");
+        printf("\n6. Sort by AP ID");
+        printf("\n7. Statistics");
+        printf("\n8. Generate Report");
+        printf("\n9. Save Data");
+        printf("\n0. Save and Exit");
+
+        printf("\n\nEnter your choice: ");
+        scanf("%d", &choice);
+        clearInputBuffer();
+
+        switch (choice)
+        {
+            case 1:
+                addRecord();
+                break;
+
+            case 2:
+                modifyRecord();
+                break;
+
+            case 3:
+                searchRecord();
+                break;
+
+            case 4:
+                displayAll();
+                break;
+
+            case 5:
+                sortByUsers();
+                break;
+
+            case 6:
+                sortByID();
+                break;
+
+            case 7:
+                statistics();
+                break;
+
+            case 8:
+                generateReport();
+                break;
+
+            case 9:
+                saveData();
+                break;
+
+            case 0:
+                saveData();
+                printf("\nProgram closed.\n");
+                break;
+
+            default:
+                printf("\nInvalid choice!\n");
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
